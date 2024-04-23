@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<link rel="stylesheet" href="assets/css/style.css" />
+	</head>
+	<body>
+		<section class="forms">
+			<form class="form" id="sign-up" action="#" method="get" novalidate>
+				<div class="input-field">
+					<label for="username">Enter User Name</label>
+					<input
+						type="text"
+						id="username"
+						name="username"
+						placeholder="user name"
+					/>
+					<span class="error-message" id="username-error"></span>
+				</div>
+
+				<div class="input-field">
+					<label for="email">Enter Email</label>
+					<input
+						type="email"
+						id="email"
+						name="email"
+						placeholder="email"
+						required
+					/>
+					<span class="error-message" id="email-error"></span>
+				</div>
+				<div class="input-field">
+					<label for="personal_number">Enter personal number</label>
+					<input
+						type="text"
+						id="personal-number"
+						placeholder="personal number"
+						required
+					/>
+					<span class="error-message" id="personal_number-error"></span>
+				</div>
+				<div class="input-field">
+					<label for="mobile_number">Enter mobile number</label>
+					<input
+						type="text"
+						id="mobile-number"
+						placeholder="mobile number"
+						required
+					/>
+					<span class="error-message" id="mobile_number-error"></span>
+				</div>
+				<div class="input-field">
+					<label for="job-description">Enter job description</label>
+					<input
+						type="text"
+						id="job-description"
+						placeholder="job description"
+					/>
+					<span class="error-message" id="job_description-error"></span>
+				</div>
+
+				<div class="input-field">
+					<label for="password">Enter Password</label>
+					<input
+						type="password"
+						id="password"
+						name="password"
+						placeholder="password"
+						minlength="5"
+					/>
+					<span class="error-message" id="password-error"></span>
+				</div>
+
+				<div class="input-field">
+					<button type="submit">Submit</button>
+				</div>
+			</form>
+		</section>
+
+		<section class="modals">
+			<button class="open-sign-in btn">open sign in</button>
+
+			<div class="modal" id="sign-up-modal">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3>sign-up-modal</h3>
+						<button class="modal-close">X</button>
+					</div>
+					<div class="modal-body">this is modal body</div>
+				</div>
+			</div>
+			<div class="modal" id="sign-up-error-modal">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3>sign-up-error-modal</h3>
+						<button class="modal-close">X</button>
+					</div>
+					<div class="modal-body">this is modal body</div>
+				</div>
+			</div>
+
+			<dialog>
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3>dialog-modal</h3>
+						<button class="modal-close">X</button>
+					</div>
+					<div class="modal-body">this is modal body</div>
+				</div>
+			</dialog>
+		</section>
+
+		<script src="assets/js/forms.js"></script>
+	</body>
+</html>
