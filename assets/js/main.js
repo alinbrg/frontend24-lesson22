@@ -13,7 +13,8 @@ const regForm = document.querySelector("#reg"),
 	userZip = document.querySelector("#user_zip-code"),
 	userGender = document.querySelector("#user_gender"),
 	// user id ფორმში, რომელიც გვჭირდება დაედითებისთვის
-	user_id = document.querySelector("#user_id");
+	user_id = document.querySelector("#user_id"),
+	userTableBody = document.querySelector("tbody");
 
 const user = {
 	first_name: "satesto",
@@ -77,13 +78,63 @@ function userActions() {
 	// 3. id შეინახეთ data-user-id ატრიბუტად ღილაკებზე, data ატრიბუტებზე წვდომა შეგიძლიათ dataset-ის გამოყენებით მაგ:selectedElement.dataset
 	// 4. წაშლა ღილაკზე დაჭერისას უნდა გაიგზავნოს წაშლის მოთხოვნა (deleteUser ფუნქციის მეშვეობით) სერვერზე და გადაეცეს id
 	// 5. ედიტის ღილაკზე უნდა გაიხსნას მოდალი სადაც ფორმი იქნება იმ მონაცემებით შევსებული რომელზეც მოხდა კლიკი. ედიტის ღილაკზე უნდა გამოიძახოთ getUserInfo ფუნქცია და რომ დააბრუნებს ერთი მომხმარებლის დატას (ობიექტს და არა მასივს) const data = await getUser(btn.dataset.userId); ეს დატა უნდა შეივსოს ფორმში და ამის შემდეგ შეგიძლიათ დააედიტოთ ეს ინფორმაცია და ფორმის დასაბმითებისას უნდა მოხდეს updateUser() ფუნქციის გამოძახება, სადაც გადასცემთ განახლებულ იუზერის ობიექტს, გვჭირდება იუზერის აიდიც, რომელიც  მოდალის გახსნისას user_id-ის (hidden input არის და ვიზუალურად არ ჩანს) value-ში შეგიძლიათ შეინახოთ.
+
+	const editBtns = document.querySelectorAll(".edit");
+	const deleteBtns = document.querySelectorAll(".dlt");
+
+	editBtns.forEach((btn) => {
+		btn.addEventListener("click", async (e) => {
+			console.log(btn.dataset.userId, "edit");
+
+			const data = await getUserInfo(btn.dataset.userId);
+			// console.log("received user data", data);
+
+			userName.value = data.users.first_name;
+			userSurname.value = data.users.last_name;
+			userEmail.value = data.users.email;
+			userPhone.value = data.users.phone;
+			userPersonalID.value = data.users.id_number;
+			userZip.value = data.users.zip_code;
+			userGender.value = data.users.gender;
+			user_id.value = data.users.id;
+
+			showSelectedModal("#reg-modal");
+		});
+	});
+
+	deleteBtns.forEach((btn) => {
+		btn.addEventListener("click", (e) => {
+			console.log(btn.dataset.userId, "delete");
+			const id = btn.dataset.userId;
+			deleteUser(id);
+		});
+	});
 }
 
 function renderUsers(usersArray) {
 	// TODO: usersArray არის სერვერიდან დაბრუნებული ობიექტების მასივი
 	// TODO: ამ მონაცმების მიხედვით html ში ჩასვით ცხრილი როგორც "ცხრილი.png" შია
 
-	console.log(usersArray);
+	const userRows = usersArray.map((user) => {
+		return `
+						<tr>
+							<td>${user.id}</td>
+							<td>${user.first_name}</td>
+							<td>${user.last_name}</td>
+							<td>${user.email}</td>
+							<td>${user.id_number}</td>
+							<td>${user.phone}</td>
+							<td>${user.zip_code}</td>
+							<td>${user.gender}</td>
+							<td>
+								<button class="edit btn" type="button" data-user-id="${user.id}" data-name="satesto">Edit</button>
+								<button class="dlt btn" type="button" data-user-id="${user.id}">Delete</button>
+							</td>
+						</tr>`;
+	});
+
+	userTableBody.innerHTML = userRows.join("");
+	// console.log(usersArray);
 	userActions(); // ყოველ რენდერზე ახლიდან უნდა მივაბათ ივენთ ლისნერები
 }
 
@@ -92,7 +143,7 @@ function getAllUsers() {
 		.then((response) => response.json())
 		.then((data) => {
 			if (data.status === 1) {
-				console.log(data.users);
+				// console.log(data.users);
 				const users = data.users;
 				// html-ში გამოტანა მონაცემების
 				renderUsers(users);
@@ -102,7 +153,7 @@ function getAllUsers() {
 }
 
 function deleteUser(id) {
-	fetch(`http://borjomi.loremipsum.ge/api/delete-user/${id}`, {
+	fetch(`https://borjomi.loremipsum.ge/api/delete-user/${id}`, {
 		method: "delete",
 	})
 		.then((res) => res.json())
@@ -134,6 +185,27 @@ function updateUser(userObj) {
 	// TODO დაასრულეთ ფუნქცია
 	//  method: "put",  http://borjomi.loremipsum.ge/api/update-user/${userObj.id}
 	// TODO: შენახვის, ედიტირების და წაშლის შემდეგ ახლიდან წამოიღეთ დატა
+
+	fetch(`https://borjomi.loremipsum.ge/api/update-user/${userObj.id}`, {
+		method: "put",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(userObj),
+	})
+		.then((res) => res.json())
+		.then((data) => {
+			console.log(data);
+			getAllUsers();
+
+			user_id.value = "";
+			regForm.reset();
+			//ფორმის დახურვა
+			document.querySelector("#reg-modal").classList.remove("open");
+		})
+		.catch((e) => {
+			console.log("error", e);
+		});
 }
 
 getAllUsers();
@@ -177,4 +249,11 @@ regForm.addEventListener("submit", (e) => {
 	//  TODO: თუ user_id.value არის ცარიელი (თავიდან ცარიელია) მაშინ უნდა შევქმნათ  -->  createUser(user);
 	// თუ დაედითებას ვაკეთებთ, ჩვენ ვანიჭებთ მნიშვნელობას userActions ფუნქციაში
 	// TODO: თუ user_id.value არის (არაა ცარიელი სტრინგი) მაშინ უნდა დავაედიტოთ, (როცა ფორმს ედითის ღილაკის შემდეგ იუზერის ინფუთით ვავსებთ, ვაედითებთ და ვასაბმითებთ) -->  updateUser(user);
+	if (user.id) {
+		console.log("update");
+		updateUser(user);
+	} else {
+		console.log("add new");
+		createUser(user);
+	}
 });
